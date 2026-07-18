@@ -1,0 +1,348 @@
+{
+  "name": "Workflow 2 - Aprobación y envío",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "67577171-1d47-4a67-83dc-2f568768d190",
+      "name": "Trigger - Revisar cada 1 minuto"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appPYChyij4D8IyO5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUyut0GImqVrLe5",
+          "mode": "id"
+        },
+        "filterByFormula": "{Estado} = \"Aprobado por Humano\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -64
+      ],
+      "id": "1ea3b2ff-393c-45fe-9b1c-621261bc9b2b",
+      "name": "Airtable - Buscar leads aprobados",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "4JoWsxTTjEfaJYUT",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $json.fields['Message ID'] }}",
+        "emailType": "text",
+        "message": "={{ $json.fields['Respuesta sugerida'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "b9fdd447-b429-4f0a-bebb-6da105043b3a",
+      "name": "Gmail - Responder al lead",
+      "webhookId": "5c6c8bf8-742d-441d-83c9-d730e70367d1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zzBpmToKlJmEJO74",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appPYChyij4D8IyO5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUyut0GImqVrLe5",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable - Buscar leads aprobados').item.json.id }}",
+            "Estado": "Enviado"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Asunto",
+              "displayName": "Asunto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Mensaje",
+              "displayName": "Mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Clasificación",
+              "displayName": "Clasificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "VIP",
+                  "value": "VIP"
+                },
+                {
+                  "name": "Estandar",
+                  "value": "Estandar"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Respuesta sugerida",
+              "displayName": "Respuesta sugerida",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Procesado por IA",
+                  "value": "Procesado por IA"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                },
+                {
+                  "name": "Aprobado por Humano",
+                  "value": "Aprobado por Humano"
+                },
+                {
+                  "name": "Enviado",
+                  "value": "Enviado"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Thread ID",
+              "displayName": "Thread ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Errores",
+              "displayName": "Errores",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Ultima actualización",
+              "displayName": "Ultima actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Message ID",
+              "displayName": "Message ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "e184c569-2067-44f9-a68f-22c6f2f8ce17",
+      "name": "Airtable - Actualizar (Enviado)",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "4JoWsxTTjEfaJYUT",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger - Revisar cada 1 minuto": {
+      "main": [
+        [
+          {
+            "node": "Airtable - Buscar leads aprobados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable - Buscar leads aprobados": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Responder al lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Responder al lead": {
+      "main": [
+        [
+          {
+            "node": "Airtable - Actualizar (Enviado)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cdf425f3-efae-4d91-9a34-281881752616",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4b615652c96a72fcb7e9e011b6d113d7966972dfd21ab6962cc01a8aa2eac9ad"
+  },
+  "nodeGroups": [],
+  "id": "dqz2FOdkWGnaINjH",
+  "tags": []
+}
